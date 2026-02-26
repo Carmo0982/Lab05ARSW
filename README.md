@@ -125,3 +125,43 @@ src/main/resources/
 
 ## Licencia
 Proyecto educativo con fines académicos – Escuela Colombiana de Ingeniería Julio Garavito.
+
+
+---
+# Informe de laboratorio
+
+**Autores**:
+
+- *Jacobo Diaz Alvarado*
+
+- *Santiango Carmona Pineda*
+
+## Entendiendo `security`
+
+### Clase `InMemoryUserService`
+
+- Esta clase tiene dos atributos: `users` que es un *Map* donde ambas claves son *String*. También está `encoder` que es de tipo
+  *PasswordEncoder*. Leyendo la documentación encontramos que este es una interfaz que permite cifrar contraseñas de forma segura.
+- **Constructor**: el constructor recibe solo la interfaz de *PasswordEncoder* y añade al *Map* un *student* y su contraseña y antes de añadir la contraseña la cifra. Lo mismo hace para el usuario *assistant*.
+- **isValid(String username, String rawPassword)**: este método se encarga de verificar si dado un usuario y una contraseña, busca el usuario y verifica que la contraseña registrada en el *Map* coincida con la contraseña dada.
+
+### Clase `JwtKeyProvider`
+- `@Component`: registra la clase como un bean de Spring, lo que permite inyectarla en otros componentes con `@Autowired`.
+- Esta clase tiene un único atributo keyPair de tipo KeyPair. Investigando en la documentación nos damos cuenta de que se usa para encriptar y desencriptar. Además cuenta con una clave pública y privada.
+- Tiene los respectivos getters para obtener la clave pública y privada.
+- **@PostConstruct void init()**: Este método se ejecuta automáticamente una sola vez justo después de que Spring crea el bean. Aquí es donde se generan las claves.
+- Algoritmo RSA: Se basa en un problema matemático muy difícil de resolver: factorizar números muy grandes.
+
+
+Por el momento esta clase se encuentra vacía.
+
+### Record `RsaKeyProperties`
+Esta clase mapea propiedades del archivo de configuración.
+- Consta de dos atributos: `issuer` de tipo *String*; este identifica quién emitió el JWT y `tokenTtlSeconds` de tipo *Integer* es el tiempo de vida de ese token.
+
+### Clase `SecurityConfig`
+
+- Define qué URLs son públicas (login, swagger, health) y cuáles requieren token (/api/**).
+- Configura que los tokens JWT se validen automáticamente en cada request (oauth2ResourceServer).
+- Registra el JwtDecoder para verificar tokens entrantes con la clave pública RSA.
+- Registra el JwtEncoder para crear y firmar tokens con la clave privada RSA.
