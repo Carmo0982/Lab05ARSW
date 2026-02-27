@@ -165,3 +165,47 @@ Esta clase mapea propiedades del archivo de configuración.
 - Configura que los tokens JWT se validen automáticamente en cada request (oauth2ResourceServer).
 - Registra el JwtDecoder para verificar tokens entrantes con la clave pública RSA.
 - Registra el JwtEncoder para crear y firmar tokens con la clave privada RSA.
+
+---
+## Analizando Auth
+### Clase `AuthController`
+
+- **Atributos**: 
+    1. `encoder`: es de tipo *JwtEncoder*.
+    2. `userService`: es de tipo *InMemoryUserService*.
+    3. `props`: es de tipo  *RsaKeyProperties*.
+- **Constructor**: inicializada cada uno de los atributos.
+- **LoginRequest**: es un record que representa el cuerpo del request.
+```json
+{
+  "username": "john.doe",
+  "password": "1234"
+}
+```
+- **TokenResponse**: Es un record que representa la respuesta que se le devuelve al cliente tras un login exitoso
+```json
+{
+  "access_token": "eyJhbGci...",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}
+```
+- `login(@RequestBody LoginRequest req)`: 
+  1. Valida credenciales.
+  2. Calcula tiempo de expiración a partir del atributo `props`.
+  3. `String scope = "blueprints.read blueprints.write";` define los permisos del token.
+  4. **JwtClaims**
+    ```java
+                JwtClaimsSet claims = JwtClaimsSet.builder()
+            .issuer(props.issuer())//Quién emitió el token
+            .issuedAt(now)//Cuando se emitió el token
+            .expiresAt(exp)//Cuando expira el token
+            .subject(req.username())//A quién pertenece
+            .claim("scope", scope)//Que permisos tiene
+            .build();
+    ```
+  5. Firmar con clave privada RSA
+  6. Devolver token al cliente
+
+  
+    

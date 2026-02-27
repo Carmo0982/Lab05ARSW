@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="1e7b3f93-39fa-454e-9927-8c440146cc05" name="Changes" comment="" />
+    <list default="true" id="7ac81c8a-31a3-4b50-bdca-0efef10e4826" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,22 +13,23 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Jacobo2025"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Jacobo2025&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Carmo0982/Lab05ARSW.git",
-    "accountId": "d79a48df-4669-421c-a396-4789fb945126"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Carmo0982/Lab05ARSW.git&quot;,
+    &quot;accountId&quot;: &quot;d79a48df-4669-421c-a396-4789fb945126&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
-}]]></component>
-  <component name="ProjectId" id="3AE2Uv64E7Pk8qwQViudYW0Lp6v" />
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="3AEAmKlqEv00PShybPnfDvvy0kA" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -37,21 +38,33 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feature/Parte1",
-    "ignore.virus.scanning.warn.message": "true",
+    "git-widget-placeholder": "feature/Parte2",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/JACOBO/Documents/Universidad/Semestres/Octavo Semestre/ARSW/Primer tercio/LAB4/LAB4-ARSW",
+    "last_opened_file_path": "C:/Users/JACOBO/Documents/Universidad/Semestres/Octavo Semestre/ARSW/Primer tercio/LAB5/Lab05ARSW",
     "settings.editor.selected.configurable": "vcs.Git"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Lab05ARSW" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="Lab05ARSW" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="1e7b3f93-39fa-454e-9927-8c440146cc05" name="Changes" comment="" />
-      <created>1772143427412</created>
+      <changelist id="7ac81c8a-31a3-4b50-bdca-0efef10e4826" name="Changes" comment="" />
+      <created>1772147515275</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1772143427412</updated>
+      <updated>1772147515275</updated>
     </task>
     <servers />
   </component>
