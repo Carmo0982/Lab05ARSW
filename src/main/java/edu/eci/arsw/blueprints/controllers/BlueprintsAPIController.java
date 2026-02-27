@@ -9,6 +9,7 @@ import edu.eci.arsw.blueprints.services.BlueprintsServices;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -32,9 +33,13 @@ public class BlueprintsAPIController {
 
     // GET /blueprints -> 200 ok
     @PreAuthorize("hasAuthority('SCOPE_blueprints.read')")
-    @Operation(summary = "Obtener todos los planos", description = "Retorna el conjunto completo de blueprints registrados.")
+    @Operation(summary = "Obtener todos los planos",
+            description = "Retorna el conjunto completo de blueprints registrados. Requiere scope `blueprints.read`.",
+            security = @SecurityRequirement(name = "bearer-jwt"))
     @ApiResponses({
-        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Lista de blueprints obtenida correctamente")
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Lista de blueprints obtenida correctamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Token sin el scope requerido (blueprints.read)")
     })
     @GetMapping
     public ResponseEntity<ApiResponse<Set<Blueprint>>> getAll() {
@@ -44,9 +49,13 @@ public class BlueprintsAPIController {
 
     // GET /blueprints/{author} -> 200 OK o 404 Not Found
     @PreAuthorize("hasAuthority('SCOPE_blueprints.read')")
-    @Operation(summary = "Obtener planos por autor", description = "Retorna todos los blueprints que pertenecen al autor indicado.")
+    @Operation(summary = "Obtener planos por autor",
+            description = "Retorna todos los blueprints que pertenecen al autor indicado. Requiere scope `blueprints.read`.",
+            security = @SecurityRequirement(name = "bearer-jwt"))
     @ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Blueprints del autor encontrados"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Token sin el scope requerido (blueprints.read)"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Autor no encontrado")
     })
     @GetMapping("/{author}")
@@ -64,9 +73,13 @@ public class BlueprintsAPIController {
 
     // GET /blueprints/{author}/{bpname} -> 200 OK o 404 Not Found
     @PreAuthorize("hasAuthority('SCOPE_blueprints.read')")
-    @Operation(summary = "Obtener un plano por autor y nombre", description = "Retorna el blueprint específico identificado por autor y nombre.")
+    @Operation(summary = "Obtener un plano por autor y nombre",
+            description = "Retorna el blueprint específico identificado por autor y nombre. Requiere scope `blueprints.read`.",
+            security = @SecurityRequirement(name = "bearer-jwt"))
     @ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Blueprint encontrado"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Token sin el scope requerido (blueprints.read)"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Blueprint no encontrado")
     })
     @GetMapping("/{author}/{bpname}")
@@ -85,9 +98,13 @@ public class BlueprintsAPIController {
 
     // POST /blueprints -> 201 Created o 409 Conflict
     @PreAuthorize("hasAuthority('SCOPE_blueprints.write')")
-    @Operation(summary = "Crear un nuevo plano", description = "Registra un blueprint nuevo. Retorna 409 si ya existe.")
+    @Operation(summary = "Crear un nuevo plano",
+            description = "Registra un blueprint nuevo. Retorna 409 si ya existe. Requiere scope `blueprints.write`.",
+            security = @SecurityRequirement(name = "bearer-jwt"))
     @ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "Blueprint creado correctamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Token sin el scope requerido (blueprints.write)"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "El blueprint ya existe")
     })
     @PostMapping
@@ -105,9 +122,13 @@ public class BlueprintsAPIController {
 
     // PUT /blueprints/{author}/{bpname}/points
     @PreAuthorize("hasAuthority('SCOPE_blueprints.write')")
-    @Operation(summary = "Agregar un punto a un plano", description = "Añade un nuevo punto (x, y) al blueprint indicado.")
+    @Operation(summary = "Agregar un punto a un plano",
+            description = "Añade un nuevo punto (x, y) al blueprint indicado. Requiere scope `blueprints.write`.",
+            security = @SecurityRequirement(name = "bearer-jwt"))
     @ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "202", description = "Punto agregado correctamente"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "Token sin el scope requerido (blueprints.write)"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Blueprint no encontrado")
     })
     @PutMapping("/{author}/{bpname}/points")
