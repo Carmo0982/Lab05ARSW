@@ -343,3 +343,99 @@ Para deshabilitar la seguridad temporalmente, en `SecurityConfig` cambiar:
     .anyRequest().permitAll()
 )
 ```
+
+### 5. Documentar en Swagger los endpoints de autenticación y de negocio
+
+Se documentaron **todos** los endpoints (autenticación y negocio) usando anotaciones de **Swagger / OpenAPI 3** para que la interfaz de Swagger UI sea autocontenida y permita probar la API sin herramientas externas.
+
+#### Cambios en `OpenApiConfig`
+
+Se mejoró la configuración global de OpenAPI para incluir:
+
+- **Descripción enriquecida** con Markdown: flujo de autenticación paso a paso y tabla de usuarios de prueba.
+- **Tags organizados**: `Autenticación` y `Blueprints`, para agrupar visualmente los endpoints.
+- **Información de contacto y licencia**.
+- **Descripción del esquema de seguridad** `bearer-jwt` para guiar al usuario en Swagger UI.
+
+```java
+.info(new Info()
+        .title("BluePrints API")
+        .version("2.0")
+        .description("API REST para gestión de planos protegida con JWT (OAuth 2.0).\n\n"
+                + "## Flujo de autenticación\n"
+                + "1. POST /auth/login con credenciales válidas.\n"
+                + "2. Copiar el access_token.\n"
+                + "3. Pulsar Authorize e ingresar: Bearer <access_token>.\n"
+                + "4. Los endpoints protegidos enviarán el token automáticamente.")
+        .contact(new Contact().name("Jacobo Diaz & Santiago Carmona"))
+        .license(new License().name("Uso académico – ECI")))
+.tags(List.of(
+        new Tag().name("Autenticación").description("Endpoint público de login para obtener un token JWT."),
+        new Tag().name("Blueprints").description("CRUD de planos protegido por scopes JWT.")))
+```
+
+#### Cambios en `AuthController`
+
+Se agregaron las siguientes anotaciones:
+
+| Anotación | Propósito |
+|-----------|-----------|
+| `@Tag(name = "Autenticación")` | Agrupa el endpoint bajo la sección "Autenticación" en Swagger |
+| `@Operation(summary, description)` | Documenta el propósito del login y el flujo de uso del token |
+| `@ApiResponses` | Documenta las respuestas `200` (token emitido) y `401` (credenciales inválidas) con ejemplos JSON |
+| `@SecurityRequirements` (vacío) | Indica que `/auth/login` **no requiere token**, removiendo el candado 🔒 |
+| `@Schema` en `LoginRequest` | Documenta los campos `username` y `password` con ejemplos (`student`, `student123`) |
+| `@Schema` en `TokenResponse` | Documenta los campos `access_token`, `token_type` y `expires_in` |
+| `@ExampleObject` | Muestra ejemplos concretos de request y response en Swagger UI |
+
+Ejemplo de la anotación en el método `login`:
+
+```java
+@Operation(
+    summary = "Iniciar sesión",
+    description = "Autentica al usuario y retorna un token JWT firmado con RS256..."
+)
+@ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Login exitoso — token JWT emitido",
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = TokenResponse.class),
+            examples = @ExampleObject(value = "{\"access_token\":\"eyJ...\",\"token_type\":\"Bearer\",\"expires_in\":3600}"))),
+    @ApiResponse(responseCode = "401", description = "Credenciales inválidas",
+        content = @Content(examples = @ExampleObject(value = "{\"error\":\"invalid_credentials\"}")))
+})
+@SecurityRequirements  // No requiere token
+@PostMapping("/login")
+```
+
+#### Cambios en `BlueprintsAPIController`
+
+Se enriquecieron las anotaciones existentes de cada endpoint:
+
+1. **`@SecurityRequirement(name = "bearer-jwt")`** en cada `@Operation`: Swagger UI muestra el candado y envía el token automáticamente.
+2. **Respuestas `401` y `403`**: se agregaron a todos los endpoints protegidos para documentar los errores de autenticación y autorización.
+3. **Scope requerido en la descripción**: cada endpoint indica explícitamente si necesita `blueprints.read` o `blueprints.write`.
+
+Ejemplo:
+
+```java
+@Operation(summary = "Obtener todos los planos",
+    description = "Retorna el conjunto completo de blueprints. Requiere scope blueprints.read.",
+    security = @SecurityRequirement(name = "bearer-jwt"))
+@ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Lista de blueprints obtenida correctamente"),
+    @ApiResponse(responseCode = "401", description = "Token JWT ausente o inválido"),
+    @ApiResponse(responseCode = "403", description = "Token sin el scope requerido (blueprints.read)")
+})
+```
+
+#### Resultado en Swagger UI
+
+Al acceder a `http://localhost:8080/swagger-ui/index.html` se observa:
+
+1. **Descripción general** con flujo de autenticación y usuarios de prueba.
+2. **Dos secciones** claramente separadas: *Autenticación* y *Blueprints*.
+3. El endpoint `POST /auth/login` aparece **sin candado** (público).
+4. Los endpoints de `/api/v1/blueprints/**` aparecen **con candado** .
+5. Al pulsar **Authorize** e ingresar el token, se puede probar toda la API directamente desde el navegador.
+6. Cada endpoint muestra sus posibles respuestas: `200`, `201`, `401`, `403`, `404`, `409` según corresponda.
+
