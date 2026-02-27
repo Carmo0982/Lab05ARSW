@@ -285,7 +285,54 @@ public ResponseEntity<ApiResponse> add(...) { ... }
 ```
 
 
+
+### Modificar el tiempo de expiración del token
+
+El tiempo de vida (TTL) del JWT se configura en `application.yml` mediante la propiedad `token-ttl-seconds`:
+
+```yaml
+blueprints:
+  security:
+    issuer: "https://decsis-eci/blueprints"
+    token-ttl-seconds: 30  
 ```
+
+Esta propiedad es leída por el record `RsaKeyProperties`:
+
+```java
+@ConfigurationProperties(prefix = "blueprints.security")
+public record RsaKeyProperties(String issuer, Integer tokenTtlSeconds) {}
+```
+
+Y utilizada en `AuthController` al momento de construir el token:
+
+```java
+long ttl = props.tokenTtlSeconds() != null ? props.tokenTtlSeconds() : 3600;
+Instant exp = now.plusSeconds(ttl);
+```
+
+#### Efecto observado
+
+1. **Con `token-ttl-seconds: 3600`** (valor original): el token es válido durante 1 hora. Todas las peticiones autenticadas funcionan con normalidad durante ese periodo.
+
+2. **Con `token-ttl-seconds: 30`** (valor modificado): el token expira a los 30 segundos. Si se realiza un login y luego se espera más de 30 segundos antes de hacer una petición protegida, el servidor responde con **401 Unauthorized** y el siguiente error:
+
+   ```
+   401 Unauthorized — "An error occurred while attempting to decode the Jwt: Jwt expired"
+   ```
+
+   Esto sucede porque Spring Security valida automáticamente el claim `exp` del JWT. Si `Instant.now()` es posterior a `exp`, el token se rechaza.
+
+3. **Respuesta del login**: el campo `expires_in` de la respuesta refleja el TTL configurado:
+   ```json
+   {
+     "access_token": "eyJhbGciOiJSUzI1NiJ9...",
+     "token_type": "Bearer",
+     "expires_in": 30
+   }
+   ```
+
+**Conclusión**: reducir el TTL mejora la seguridad (menor ventana de uso si el token es robado), pero obliga al cliente a re-autenticarse con más frecuencia. En producción, un valor común es entre 300 (5 min) y 3600 (1 hora), complementado con *refresh tokens*.
 
 ### Probar sin seguridad
 
