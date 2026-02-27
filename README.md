@@ -207,5 +207,92 @@ Esta clase mapea propiedades del archivo de configuración.
   5. Firmar con clave privada RSA
   6. Devolver token al cliente
 
-  
-    
+---
+# Juntando con la parte I
+
+### Dependencias necesarias
+
+Para que todo funcione, el `pom.xml` debe tener estas dependencias además de las del lab anterior:
+
+```xml
+
+    org.springframework.boot
+    spring-boot-starter-security
+
+
+
+    org.springframework.boot
+    spring-boot-starter-oauth2-resource-server
+
+```
+
+### Configuración en `application.yml`
+
+```yaml
+server:
+  port: 8080
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
+blueprints:
+  security:
+    issuer: "https://decsis-eci/blueprints"
+    token-ttl-seconds: 3600
+```
+
+> ⚠️ No agregar `jwk-set-uri` ya que las claves se generan localmente con `JwtKeyProvider`.
+
+### Configuración de Swagger
+
+En `application.properties` se cambió la ruta por defecto de la documentación:
+
+```properties
+springdoc.api-docs.path=/api-docs
+springdoc.swagger-ui.path=/swagger-ui.html
+```
+
+Por eso en `SecurityConfig` se debe permitir `/api-docs/**` y no `/v3/api-docs/**`:
+
+```java
+.requestMatchers("/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+```
+
+### Extendiendo los scopes al `BlueprintsAPIController`
+
+Se agregó `@EnableMethodSecurity` en `SecurityConfig` para habilitar `@PreAuthorize`:
+
+```java
+@Configuration
+@EnableMethodSecurity
+@EnableConfigurationProperties(RsaKeyProperties.class)
+public class SecurityConfig { ... }
+```
+
+Luego se aplicó `@PreAuthorize` en cada método del controller según si es de lectura o escritura:
+
+```java
+// Lectura
+@PreAuthorize("hasAuthority('SCOPE_blueprints.read')")
+@GetMapping
+public ResponseEntity<ApiResponse<Set>> getAll() { ... }
+
+// Escritura
+@PreAuthorize("hasAuthority('SCOPE_blueprints.write')")
+@PostMapping
+public ResponseEntity<ApiResponse> add(...) { ... }
+```
+
+
+```
+
+### Probar sin seguridad
+
+Para deshabilitar la seguridad temporalmente, en `SecurityConfig` cambiar:
+
+```java
+.authorizeHttpRequests(auth -> auth
+    .anyRequest().permitAll()
+)
+```
